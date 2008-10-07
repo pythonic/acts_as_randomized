@@ -37,13 +37,21 @@ class RandomizedTestUser < ActiveRecord::Base
 end
 
 class RandomizedTest < Test::Unit::TestCase
-  def test_create
+  def test_retains_given_id
+    RandomizedTestUser.randomized_id = 17
+    u19 = RandomizedTestUser.new :name => "19"
+    u19.id = 19
+    u19.save
+    assert_equal 19, u19.id
+  end
+
+  def test_generates_id_on_create
     RandomizedTestUser.randomized_id = 17
     u18 = RandomizedTestUser.create :name => "18"
     assert_equal 18, u18.id
   end
 
-  def test_retry
+  def test_retries_on_duplicate_key_error
     RandomizedTestUser.randomized_id = 17
     u18 = RandomizedTestUser.create :name => "18"
     RandomizedTestUser.randomized_id = 17
@@ -51,7 +59,7 @@ class RandomizedTest < Test::Unit::TestCase
     assert_equal 19, u19.id
   end
 
-  def test_fail
+  def test_raises_error
     RandomizedTestUser.randomized_id = 17
     u18 = RandomizedTestUser.create :name => "18"
     RandomizedTestUser.randomized_id = 17
@@ -62,7 +70,7 @@ class RandomizedTest < Test::Unit::TestCase
     end
   end
 
-  def test_callbacks
+  def test_invokes_callbacks
     RandomizedTestUser.randomized_callbacks = nil
     RandomizedTestUser.randomized_id = 17
     u18 = RandomizedTestUser.create :name => "18"

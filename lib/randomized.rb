@@ -40,7 +40,7 @@ module ActiveRecord::Acts
 
     module InstanceMethods
       def create_without_callbacks_with_randomized
-        return create_without_randomized if id
+        return create_without_callbacks_without_randomized if id
         connection.retry_on_duplicate_primary_key(randomized_times) do
           self.id = randomized_proc.call(self)
           create_without_callbacks_without_randomized
